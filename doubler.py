@@ -6,6 +6,9 @@ Programme pour doubler un nombre
 Par Sébastien Fortier
 """
 
+import colorama
+from colorama import Fore, Style
+colorama.init()
 
 import getpass
 import sys
@@ -16,10 +19,10 @@ def main() -> None:
     vérifier_usage()
     try:
         nombre = float(sys.argv[1])
-        print('Selon', getpass.getuser(), ':', nombre * 2)
+        print(Style.BRIGHT + Fore.CYAN + 'Selon', getpass.getuser(), ':', nombre * 2)
 
     except ValueError:
-        print(f"L'argument '{sys.argv[1]}' n'est pas un nombre.", file=sys.stderr)
+        print(Style.BRIGHT + Fore.RED + f"L'argument '{sys.argv[1]}' n'est pas un nombre.", file=sys.stderr)
 
 
 
@@ -40,8 +43,8 @@ def vérifier_usage() -> None:
     if nbargs != 1:
         nom_script = os.path.join('.', os.path.basename(sys.argv[0]))
         erreur(
-            f"Le script s'attend à recevoir 1 argument, mais vous en avez fourni {nbargs}\n"
-            f"USAGEL {nom_script} nombre"
+            Style.BRIGHT + Fore.RED + f"Le script s'attend à recevoir 1 argument, mais vous en avez fourni {nbargs}\n" +
+            Style.BRIGHT + Fore.YELLOW + f"USAGEL {nom_script} nombre"
         )
 if __name__ == '__main__':
     main()
