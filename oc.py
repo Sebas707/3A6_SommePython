@@ -8,7 +8,9 @@ Par Sébastien Fortier
 
 import colorama
 from colorama import Fore, Style
+
 colorama.init()
+
 
 def main() -> None:
     """Fonction principale"""
@@ -19,7 +21,6 @@ def main() -> None:
         text = Style.BRIGHT + Fore.RED + f"Le fichier 'océans.txt' n'existe pas\n"
 
     print(text)
-
 
 
 if __name__ == '__main__':

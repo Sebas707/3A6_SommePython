@@ -6,9 +6,9 @@ Affiche la liste deds fichiers passés en arguments
 Par Sébatien Fortier
 """
 
-
 import glob
 import sys
+
 
 def main() -> None:
     """Fonction principale"""
@@ -25,8 +25,6 @@ def main() -> None:
 
     for file in liste:
         print(file)
-
-
 
 
 if __name__ == '__main__':

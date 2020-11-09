@@ -12,8 +12,5 @@ def main() -> None:
     print("Sébastien Fortier")
 
 
-
-
-
 if __name__ == '__main__':
     main()

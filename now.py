@@ -9,7 +9,6 @@ Par Sébastien Fortier
 import datetime
 
 
-
 def main() -> None:
     """Fonction principale"""
 
@@ -22,8 +21,6 @@ def main() -> None:
     print("avant-hier: " + str(datetime.datetime.today().date() + datetime.timedelta(days=-2)))
     print("noel: " + str(datetime.date.today().year) + "-12-25")
     print("noel dans: " + str(nb_jours_avant_noel.days) + " jours")
-
-
 
 
 if __name__ == '__main__':

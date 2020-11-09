@@ -8,6 +8,7 @@ Par Sébatien Fortier
 
 import sys
 
+
 def main() -> None:
     """Fonction principale"""
 
@@ -27,9 +28,6 @@ def main() -> None:
             print(arg)
 
     print(lignes[-1], end="")
-
-
-
 
 
 if __name__ == '__main__':

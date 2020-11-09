@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 
-import pprint
-import sys
 """
 Programme pour afficher les arguments
 
 Par Sébastien Fortier
 """
+
+import pprint
+import sys
+
 
 def main() -> None:
     """Fonction principale"""

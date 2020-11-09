@@ -20,7 +20,5 @@ def main() -> None:
         print("Les cinq océans, par Sébastien Fortier.", file=f)
 
 
-
-
 if __name__ == '__main__':
     main()

@@ -6,8 +6,8 @@ Echo en Python
 Par Sébatien Fortier
 """
 
-
 import sys
+
 
 def main() -> None:
     """Fonction principale"""
@@ -19,9 +19,6 @@ def main() -> None:
         message += str(arg) + " "
 
     print(message)
-
-
-
 
 
 if __name__ == '__main__':

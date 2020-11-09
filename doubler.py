@@ -8,11 +8,13 @@ Par Sébastien Fortier
 
 import colorama
 from colorama import Fore, Style
+
 colorama.init()
 
 import getpass
 import sys
 import os
+
 
 def main() -> None:
     """Fonction principale"""
@@ -23,8 +25,6 @@ def main() -> None:
 
     except ValueError:
         print(Style.BRIGHT + Fore.RED + f"L'argument '{sys.argv[1]}' n'est pas un nombre.", file=sys.stderr)
-
-
 
 
 def erreur(msg: str) -> None:
@@ -46,7 +46,7 @@ def vérifier_usage() -> None:
             Style.BRIGHT + Fore.RED + f"Le script s'attend à recevoir 1 argument, mais vous en avez fourni {nbargs}\n" +
             Style.BRIGHT + Fore.YELLOW + f"USAGEL {nom_script} nombre"
         )
+
+
 if __name__ == '__main__':
     main()
-
-

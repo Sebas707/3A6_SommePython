@@ -6,14 +6,14 @@
 Par Sébatien Fortier
 """
 
-
 import sys
 import getpass
 import colorama
-from math import *
 
 from colorama import Fore, Style
+
 colorama.init()
+
 
 def main() -> None:
     """Fonction principale"""
@@ -31,11 +31,6 @@ def main() -> None:
     except Exception as ex:
         print(Style.BRIGHT + Fore.RED + str(ex), file=sys.stderr)
         sys.exit(1)
-
-
-
-
-
 
 
 if __name__ == '__main__':

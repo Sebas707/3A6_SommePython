@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
-import os
-import getpass
-import pprint
-
 """
 Programme pour accéder aux variables d'environnement
 
 Par Sébastien Fortier
 """
+
+import os
+import getpass
+
 
 def main() -> None:
     """Fonction principale"""
@@ -21,10 +21,9 @@ def main() -> None:
     print(f" - {os.name}")
     print(f" - user: {getpass.getuser()}")
     print(f" - home: {os.path.expanduser('~')}")
-    #print()
-    #pprint.pprint(dict(os.environ), width=40)
+    # print()
+    # pprint.pprint(dict(os.environ), width=40)
     pass
-
 
 
 if __name__ == '__main__':
