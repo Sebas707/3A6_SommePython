@@ -6,13 +6,14 @@ Programme reproduit l'action de la commande touch dans linux
 Par Sébastien Fortier
 """
 
-import math
 import argparse
-import colorama
+import os
+import os.path
 
 from colorama import init, Fore, Style
 
 init(convert=True)
+
 
 def parse_args() -> argparse.Namespace:
     """Gère les arguments passés à la ligne de commande"""
@@ -31,21 +32,50 @@ def main() -> None:
     args = parse_args()
 
     for fichier in args.fichier:
-        try:
-            f = open(fichier, "x")
-            if args.texte is not None:
-                f.write(args.texte)
+        if fichier == "../" or fichier == "..\\":
+            os.chdir("..")
+            continue
+        if fichier[-1] == "\\" or fichier[-1] == "/":
+            gérer_dossier(fichier)
             if args.verbeux:
-                print(Fore.WHITE + "Fichier créé: " + Fore.CYAN + fichier)
+                print(Fore.WHITE + "Dossier créé: " + Fore.CYAN + fichier)
 
-        except FileExistsError:
-            if args.quiet:
-                print("", end='')
-            else:
-                print(Style.BRIGHT + Fore.YELLOW +"Le fichier existe déjà: " + Style.BRIGHT + Fore.CYAN + fichier)
-        except OSError as ex:
-            print(Fore.RED + str(type(ex).__name__ + ": ") + Fore.YELLOW + str(ex))
-            exit(1)
+        else:
+            try:
+                gérer_fichier(fichier, args)
+            except FileExistsError:
+                if args.quiet:
+                    print(
+                        Style.BRIGHT + Fore.YELLOW + "Le fichier existe déjà: " + Style.BRIGHT + Fore.CYAN + fichier)
+            except OSError as ex:
+                print(Fore.RED + str(type(ex).__name__ + ": ") + Fore.YELLOW + str(ex))
+                exit(1)
+
+
+def gérer_dossier(fichier):
+    """Effectue les différentes actions si l'on veut créer un dossier"""
+    path = ""
+    try:
+        fichier_nouveau = fichier[:-1]
+        path = os.getcwd() + "/" + fichier_nouveau
+        os.mkdir(path)
+
+        os.chdir(path)
+    except FileExistsError:
+        print("", end='')
+        os.chdir(path)
+    except Exception as ex:
+        print(Fore.RED + str(type(ex).__name__ + ": ") + Fore.YELLOW + str(ex))
+        exit(1)
+
+
+def gérer_fichier(fichier, args):
+    """Effectue les différentes actions si l'on veut créer un fichier"""
+    f = open(fichier, "x")
+    if args.texte is not None:
+        f.write(args.texte)
+    if args.verbeux:
+        print(Fore.WHITE + "Fichier créé: " + Fore.CYAN + fichier)
 
 
 if __name__ == '__main__':
