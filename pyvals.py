@@ -11,10 +11,19 @@ import sys
 import getpass
 import colorama
 from colorama import Fore, Style
-
+import math
 from math import * # noqa
 
 colorama.init()
+
+GLOBALS = {"__builtins__": {},
+           **math.__dict__,
+           "abs": abs,
+           "min": min,
+           "max": max,
+           "sum": sum
+           }
+LOCALS = {}
 
 
 def main() -> None:
@@ -22,10 +31,11 @@ def main() -> None:
 
     try:
         print(Fore.CYAN + "Selon Sébas Fortier:", Fore.RESET,
-              eval(''.join(sys.argv[1:]) or "None"))
+              eval(''.join(sys.argv[1:]) or "None", GLOBALS, LOCALS))
     except Exception as ex:
         print(Fore.RED, ex, file=sys.stderr, sep='')
         sys.exit(1)
+
 
 if __name__ == '__main__':
     main()
