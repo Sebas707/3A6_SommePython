@@ -8,9 +8,8 @@ Par Sébatien Fortier
 """
 
 import sys
-import getpass
 import colorama
-from colorama import Fore, Style
+from colorama import Fore
 import math
 from math import * # noqa
 
