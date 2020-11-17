@@ -13,11 +13,20 @@ import shlex
 
 def main() -> None:
     """Fonction principale"""
-    args = shlex.join(sys.argv[1:])
-    commande = "findstr " + args
+    if os.name == 'posix':
+        args = shlex.join(sys.argv[1:]).split(" ")
+        commande = "egrep"
+    else:
+        args = sys.argv[1:]
+        commande = "findstr"
+
+    for arg in args:
+        commande += " \"" + arg + "\""
+
     exitcode = os.system(commande)
     if exitcode:
         print("La commande exécutée était: " + commande)
+
     sys.exit(exitcode)
 
 
