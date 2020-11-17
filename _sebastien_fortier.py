@@ -3,13 +3,13 @@
 """
 Affiche mon nom
 
-Par Sébatien Fortier
+Par Sebastien Fortier
 """
 
 
 def main() -> None:
     """Fonction principale"""
-    print("Sébastien Fortier")
+    print("Sebastien Fortier")
 
 
 if __name__ == '__main__':
