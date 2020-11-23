@@ -8,11 +8,9 @@ Par Sébatien Fortier
 
 import re
 import sys
-import types
-import builtins
 import colorama
 
-from colorama import Fore, Style
+from colorama import Fore
 
 colorama.init()
 
@@ -35,16 +33,35 @@ def main() -> None:
 
     if match:
         print(
-            Style.BRIGHT + Fore.YELLOW + "[SF]" + Fore.WHITE + "Affichage de l'aide pour: " + Fore.MAGENTA + argument,
+            Fore.YELLOW + "[SF]" + Fore.WHITE + "Affichage de l'aide pour: " + Fore.MAGENTA + argument,
             file=sys.stderr)
-        if argument in eval("[i for i in dir(builtins) if i.islower()]"):
-            help(match.string)
+        if argument.__contains__("."):
+            if argument[-1] == '.':
+                argument = argument[:-1]
+                if argument in sys.builtin_module_names or argument in sys.modules:
+                    help(argument)
+                else:
+                    print(Fore.YELLOW + "[SF] " + Fore.RED + "No module named " + "'" + argument + "'")
+            else:
+                module_nom = re.search(r'(\w+)', argument)[1]
+                if module_nom in sys.modules or module_nom in sys.builtin_module_names:
+                    exec("import " + module_nom)
+                    if eval("hasattr(" + module_nom + ", argument[len(module_nom) + 1:])"):
+                        help(argument)
+                    else:
+                        print(Fore.YELLOW + "[SF] " + Fore.RED + "module " + "'" + module_nom + "' has no attribute " + "'" + argument[len(module_nom) + 1:] + "'")
+                else:
+                    print(Fore.YELLOW + "[SF] " + Fore.RED + "module " + "'" + module_nom + "'")
+
         else:
-            print(Fore.YELLOW + "[SF] " + Fore.RED + "name " + "'" + match.string + "'" + " is not defined")
+            if argument in eval("[i for i in dir(builtins) if i.islower()]"):
+                help(match.string)
+            else:
+                print(Fore.YELLOW + "[SF] " + Fore.RED + "name " + "'" + argument + "'" + " is not defined")
 
     else:
         print(
-            Style.BRIGHT + Fore.YELLOW + "[SF]" + Fore.RED + "Le sujet de l'aide n'est pas valide: " + Fore.MAGENTA + argument,
+            Fore.YELLOW + "[SF]" + Fore.RED + "Le sujet de l'aide n'est pas valide: " + Fore.MAGENTA + argument,
             file=sys.stderr)
         exit(1)
 
