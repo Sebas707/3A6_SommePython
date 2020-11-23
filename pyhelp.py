@@ -49,7 +49,8 @@ def main() -> None:
                     if eval("hasattr(" + module_nom + ", argument[len(module_nom) + 1:])"):
                         help(argument)
                     else:
-                        print(Fore.YELLOW + "[SF] " + Fore.RED + "module " + "'" + module_nom + "' has no attribute " + "'" + argument[len(module_nom) + 1:] + "'")
+                        print(Fore.YELLOW + "[SF] " + Fore.RED + "module " + "'" + module_nom + "' has no attribute " +
+                              "'" + argument[len(module_nom) + 1:] + "'")
                 else:
                     print(Fore.YELLOW + "[SF] " + Fore.RED + "module " + "'" + module_nom + "'")
 
