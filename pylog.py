@@ -12,8 +12,10 @@ import re
 import colorama
 import argparse
 import sys
+import os
 import pprint
-import tabulate
+import lynx
+from tabulate import tabulate
 import pyinputplus as pyip
 import datetime
 from colorama import Fore, Style
@@ -31,6 +33,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('message', type=str, nargs="*", help="Message à journaliser")
     parser.add_argument('-t', metavar='{n,a,e}', type=str, help='Type de log')
     parser.add_argument('-l', '--list', action='store_true', help='Afficher les logs')
+    parser.add_argument('-b', '--browse', action='store_true', help='Afficher les logs dans le navigateur')
     #parser.add_argument('-l', '--list', metavar='', type=str, help='Afficher les logs')
     parser.add_argument('--type', metavar='{notification, avertissement, erreur}', type=str, help="Type de log")
     parser.add_argument('-u', '--user', type=str, metavar='USER', help="Nom de l'utilisateur")
@@ -42,7 +45,15 @@ def main() -> None:
 
     args = parse_args()
     message = ""
-
+    if args.browse:
+        f = open("pylog.tsv", "r")
+        if os.name == 'posix':
+            print("haha linux")
+            print(tabulate(f, tablefmt="html"))
+        else:
+            print("haha windows")
+            print(f)
+        exit(0)
 
     if len(sys.argv) == 1:
         print(Style.BRIGHT + Fore.YELLOW + "[SF]" + Fore.WHITE + " Svp, veuillez entrer votre message et "
