@@ -6,6 +6,7 @@ Utilisation du module pyInput
 Par Sébatien Fortier
 """
 
+import csv
 import getpass
 import re
 import colorama
@@ -54,7 +55,7 @@ def main() -> None:
 
         nom = pyip.inputStr(blank=True,
                             prompt=Fore.BLUE + "Utilisateur [" + Fore.YELLOW + getpass.getuser() + Fore.BLUE + "]: " +
-                            Fore.WHITE,
+                                   Fore.WHITE,
                             blockRegexes=[("", Fore.YELLOW + "[SF] " +
                                            Fore.WHITE + "Lettres, chiffres, tirets, espaces et apostrophes seulement "
                                                         "dans le nom svp")], allowRegexes=['^[\w\d_\- \']+$'])
@@ -69,6 +70,14 @@ def main() -> None:
         data = {'dateheure': date_heure, 'logtype': type_message, 'message': message, 'utilisateur': nom}
 
         pprint.pprint(data)
+
+        with open('pylog.tsv', 'a', newline='') as csvFile:
+            nom_champs = ['dateheure', 'logtype', 'message', 'utilisateur']
+            writer = csv.DictWriter(csvFile, nom_champs, delimiter='\t')
+
+            writer.writeheader()
+            writer.writerow({'dateheure': date_heure, 'logtype': type_message, 'message': message,
+                             'utilisateur': nom})
     else:
         message = ""
         utilisateur = getpass.getuser()
@@ -112,6 +121,24 @@ def main() -> None:
         date_heure = str(datetime.datetime.today())
         data = {'dateheure': date_heure, 'logtype': type_message, 'message': message, 'utilisateur': utilisateur}
         pprint.pprint(data)
+
+        try:
+            with open('pylog.tsv', 'a', newline='') as csvFile:
+                nom_champs = ['dateheure', 'logtype', 'message', 'utilisateur']
+                writer = csv.DictWriter(csvFile, nom_champs, delimiter='\t')
+
+                writer.writeheader()
+                writer.writerow({'dateheure': date_heure, 'logtype': type_message, 'message': message,
+                                 'utilisateur': utilisateur})
+        except Exception as ex:
+            print(
+                Fore.YELLOW + "[SF] " + Fore.RED + str(
+                    ex.__class__.__name__) + ":" + Fore.YELLOW + str(ex))
+            exit(1)
+
+
+
+
 
 
 if __name__ == '__main__':
