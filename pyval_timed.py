@@ -7,11 +7,12 @@ Programme pour évaluer une expression Python
 2020, Sébastien Fortier
 """
 
+from timeit import default_timer as timer
 from typing import NoReturn
-from colorama import Fore, Style
-from m_safe_eval import safe_eval as eval  # noqa
 import sys
+from colorama import Fore, Style, init
 
+init(convert=True)
 
 def exexit(ex: BaseException, exit_code: int = 1) -> NoReturn:
     """Rapport une erreur et termine le programme"""
@@ -24,12 +25,15 @@ def exexit(ex: BaseException, exit_code: int = 1) -> NoReturn:
 
 def main() -> None:
     """Fonction principale"""
+    début = timer()
     try:
         evaluation = eval(' '.join(sys.argv[1:]) or "None")
-        print(Fore.CYAN + "Selon Seb Fortier:", Fore.RESET, evaluation)
-
+        print(Fore.CYAN + "Selon Séb Fortier", Fore.RESET, evaluation)
     except BaseException as ex:
         exexit(ex)
+
+    finally:
+        print(Fore.YELLOW + "Durée:", timer() - début, "sec")
 
 
 if __name__ == '__main__':
