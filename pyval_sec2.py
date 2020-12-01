@@ -26,7 +26,7 @@ def exexit(ex: BaseException, exit_code: int = 1) -> NoReturn:
 def main() -> None:
     """Fonction principale"""
     try:
-        evaluation = eval(' '.join(sys.argv[1:]) or "None")
+        evaluation = eval(' '.join(sys.argv[1:]) or "None", delai_sec=2.0)
         print(Fore.CYAN + "Selon Seb Fortier:", Fore.RESET, evaluation)
 
     except TimeoutError:

@@ -16,7 +16,7 @@ SAFE_GLOBALS = {
     "abs": abs,
     "min": min,
     "max": max,
-    "sum": sum
+    "sum": sum,
 }
 """Globals sécuritaire pour eval """
 
