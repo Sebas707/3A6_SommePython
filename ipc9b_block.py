@@ -8,6 +8,7 @@ Par Sébastien Fortier
 import colorama
 from colorama import Fore, Style
 import sys
+from queue import Empty
 from typing import NoReturn, Optional
 from m_safe_eval import safe_eval
 from multiprocessing import Process, Queue
@@ -27,17 +28,13 @@ def main() -> None:
         queue = Queue()
         ps = Process(target=pyval, args=(expr, queue))
         ps.start()
-        ps.join(DELAI_SEC)
-        if ps.is_alive():
-            ps.terminate()
-            raise TimeoutError(f"Le délai de {DELAI_SEC} secondes est écoulé")
-        évaluation = queue.get()
+        évaluation = queue.get(block=True, timeout=DELAI_SEC)
         if isinstance(évaluation, BaseException):
             raise évaluation
-        print(Fore.CYAN + "Fichier selon Sébastien Fortier:", Fore.RESET, évaluation)
+        print(Fore.CYAN + "Block selon Sébastien Fortier:", Fore.RESET, évaluation)
+    except Empty:
+        exexit(TimeoutError(f"Le délai de {DELAI_SEC} secondes est écoulé"))
 
-    except KeyboardInterrupt as ex:
-        exexit(ex)
     except BaseException as ex:
         exexit(ex)
 
