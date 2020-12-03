@@ -8,9 +8,10 @@ Par Sébastien Fortier
 import colorama
 from colorama import Fore, Style
 import sys
-from typing import NoReturn
+from typing import NoReturn, Optional
 from m_safe_eval import safe_eval
-from multiprocessing import Process, Value
+from multiprocessing import Process, Pipe
+from multiprocessing.connection import Connection
 import ctypes
 import pickle
 
@@ -20,46 +21,40 @@ DELAI_SEC = 2.0
 
 def main() -> None:
     """Fonction principale"""
+    ps: Optional[Process] = None
     try:
         expr = ' '.join(sys.argv[1:]) or "None"
-        filename = "ipc5.bin"
-        ps = Process(target=pyval, args=(expr, filename))
+        parent_conn, child_conn = Pipe()
+        ps = Process(target=pyval, args=(expr, child_conn))
         ps.start()
-        ps.join(DELAI_SEC)
-        if ps.is_alive():
-            ps.terminate()
+        if not parent_conn.poll(DELAI_SEC):
             raise TimeoutError(f"Le délai de {DELAI_SEC} secondes est écoulé")
-        if not ps.exitcode:
-            with open(filename, "r+b") as f:
-                évaluation = pickle.load(f)
-            if isinstance(évaluation, BaseException):
-                raise évaluation
-            print(Fore.CYAN + "Selon Sébastien Fortier:", Fore.RESET, évaluation)
+        évaluation = parent_conn.recv()
+        if isinstance(évaluation, BaseException):
+            raise évaluation
+        print(Fore.CYAN + "Fichier selon Sébastien Fortier:", Fore.RESET, évaluation)
 
-
-
-    except Exception as ex:
+    except KeyboardInterrupt as ex:
+        exexit(ex)
+    except BaseException as ex:
         exexit(ex)
 
-    except KeyboardInterrupt:
-        pass
+    finally:
+        ps and ps.terminate()
 
-
-def pyval(expr: str, filename: str) -> None:
+def pyval(expr: str, pipe: Connection) -> None:
     """
     Évalue une expression.
-    Retour via sérialisation dans un fichier.
-    Même l'exception est retournée!
+    Retour (sérialisé) via pipe.
     """
     try:
         évaluation = safe_eval(expr)
-        print(expr, '=', évaluation)
 
     except BaseException as ex:
         évaluation = ex
 
-    with open(filename, 'w+b') as f:
-        pickle.dump(évaluation, f)
+    pipe.send(évaluation)
+    pipe.close()
 
 
 def exexit(ex: BaseException, exit_code: int = 1) -> NoReturn:
@@ -69,7 +64,6 @@ def exexit(ex: BaseException, exit_code: int = 1) -> NoReturn:
           Fore.YELLOW, ": ", ex, Fore.RESET,
           file=sys.stderr, sep='')
     sys.exit(exit_code)
-
 
 if __name__ == '__main__':
     main()

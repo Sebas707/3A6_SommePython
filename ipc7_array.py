@@ -11,55 +11,55 @@ import sys
 from typing import NoReturn
 from m_safe_eval import safe_eval
 from multiprocessing import Process, Value
+import multiprocessing as mp
 import ctypes
 import pickle
 
 colorama.init()
+
 DELAI_SEC = 2.0
+ARRAY_SIZE = 2048
 
 
 def main() -> None:
     """Fonction principale"""
     try:
         expr = ' '.join(sys.argv[1:]) or "None"
-        filename = "ipc5.bin"
-        ps = Process(target=pyval, args=(expr, filename))
+        retour = mp.Array(ctypes.c_char, ARRAY_SIZE)
+        ps = mp.Process(target=pyval, args=(expr, retour))
         ps.start()
         ps.join(DELAI_SEC)
         if ps.is_alive():
             ps.terminate()
             raise TimeoutError(f"Le délai de {DELAI_SEC} secondes est écoulé")
-        if not ps.exitcode:
-            with open(filename, "r+b") as f:
-                évaluation = pickle.load(f)
-            if isinstance(évaluation, BaseException):
-                raise évaluation
-            print(Fore.CYAN + "Selon Sébastien Fortier:", Fore.RESET, évaluation)
+        évaluation = pickle.loads(bytes(retour[:]))
+        if isinstance(évaluation, BaseException):
+            raise évaluation
+        print(Fore.CYAN + "Array selon Sébastien Fortier:", Fore.RESET, évaluation)
 
 
+    except KeyboardInterrupt as ex:
+        exexit(ex)
 
     except Exception as ex:
         exexit(ex)
 
-    except KeyboardInterrupt:
-        pass
 
-
-def pyval(expr: str, filename: str) -> None:
+def pyval(expr: str, retour: mp.Array) -> None:
     """
     Évalue une expression.
-    Retour via sérialisation dans un fichier.
-    Même l'exception est retournée!
+    Retour sérialisé via shared memory (array).
+    Les exceptions sont aussi retournées
     """
     try:
         évaluation = safe_eval(expr)
-        print(expr, '=', évaluation)
 
     except BaseException as ex:
         évaluation = ex
 
-    with open(filename, 'w+b') as f:
-        pickle.dump(évaluation, f)
+
+    sérialisation: bytes = pickle.dumps(évaluation)
+    retour[:len(sérialisation)] = sérialisation
 
 
 def exexit(ex: BaseException, exit_code: int = 1) -> NoReturn:
