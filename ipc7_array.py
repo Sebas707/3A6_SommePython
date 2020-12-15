@@ -59,6 +59,12 @@ def pyval(expr: str, retour: mp.Array) -> None:
 
 
     sérialisation: bytes = pickle.dumps(évaluation)
+
+    if len (sérialisation) > ARRAY_SIZE:
+        sérialisation: bytes = pickle.dumps(
+            pickle.PickleError("La taille du résultat (" + str(len(sérialisation)) + " octets) est trop grande pour le buffer interprocessus (max = 2048)")
+        )
+
     retour[:len(sérialisation)] = sérialisation
 
 

@@ -41,8 +41,8 @@ def main() -> None:
     except Exception as ex:
         exexit(ex)
 
-    except KeyboardInterrupt:
-        pass
+    except KeyboardInterrupt as ex:
+        exexit(ex)
 
 
 def pyval(expr: str, filename: str) -> None:
