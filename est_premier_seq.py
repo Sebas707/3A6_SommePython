@@ -13,6 +13,7 @@ import math
 import sys
 from timeit import default_timer as time
 from typing import List
+
 colorama.init()
 
 
@@ -20,10 +21,10 @@ def main(argv: List[str]) -> None:
     """Fonction principale"""
     temps_début = time()
     try:
-        if len(sys.argv) == 1:
+        if len(argv) == 1:
             raise IndexError("La commande doit avoir au moins un argument")
 
-        est_nombre_premier = est_premier_séq(int(sys.argv[1]))
+        est_nombre_premier = est_premier_séq(int(argv[1]))
         temps_fin = time()
         temps = temps_fin - temps_début
         if est_nombre_premier:
@@ -38,7 +39,6 @@ def main(argv: List[str]) -> None:
         temps = temps_fin - temps_début
         print(Fore.LIGHTMAGENTA_EX + "Durée: " + str(temps) + " sec")
         exexit(KeyboardInterrupt("Interruption clavier"))
-
 
     except BaseException as exception:
         exexit(exception)
