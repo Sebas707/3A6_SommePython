@@ -7,6 +7,8 @@ Programme multi-processus pour déterminer si un nombre est premier
 """
 
 import argparse
+import multiprocessing
+
 import colorama
 from colorama import Fore, Style
 from typing import NoReturn
@@ -16,32 +18,33 @@ import os
 import sys
 from timeit import default_timer as time
 from multiprocessing import Process
+import multiprocessing as mp
 from typing import List
 
 colorama.init()
 
-parser = argparse.ArgumentParser(description='Détecteur de nombres premier -- 2020, par Sébastien Fortier')
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args(arg: List[str]) -> argparse.Namespace:
     """Gère le arguments passé à la ligne de commande"""
+    parser = argparse.ArgumentParser(description='Détecteur de nombres premier -- 2020, par Sébastien Fortier')
 
     parser.add_argument('nombre', type=int, nargs=1, help="Nombre à traiter pour connaître sa primalité")
     parser.add_argument('-d', '--délai', metavar='DÉLAI', type=float, help='Délai pour le calcul (défaut 10 sec)')
     parser.add_argument('-e', '--explication', action='store_true', help='Expliquer pourquoi non premier')
-    parser.add_argument('-p', '--processus', metavar='PROCESSUS', type=float, help='Nombre de processus à utiliser '
-                                                                                   '(défaut 4)')
+    parser.add_argument('-p', '--processus', metavar='PROCESSUS', type=int, help='Nombre de processus à utiliser'
+                                                                                   '(défaut 4)', default=4)
     parser.add_argument('-t', '--trace', action='store_true', help='Activer la trace d''exécution')
     parser.add_argument('-q', '--quiet', action='store_true', help='Ne pas afficher les processus')
 
-    return parser.parse_args()
+    return parser.parse_args(arg)
 
 
 def main(argv: List[str]) -> None:
     """Fonction principale"""
     temps_début = time()
+    args = parse_args(argv[1:])
 
-    args = parse_args()
 
     try:
         if len(argv) == 1:
@@ -103,69 +106,53 @@ def est_premier_séq(nombre: int, arg: argparse.Namespace) -> bool:
         return True
 
     else:
-        listeProcess = [1, 2, 3, 4]
+        nombre_processus = arg.processus
+
+        if arg.processus == 0:
+            nombre_processus = mp.cpu_count()
+        elif arg.processus < 0:
+            nombre_processus = mp.cpu_count() + arg.processus
+
+        listeProcess = list(range(0, nombre_processus))
+
 
 
         if arg.quiet:
-            process_1 = Process(target=est_premier_parralèle, args=(nombre, 3, racine))
-            process_1.start()
 
-            listeProcess[0] = process_1
+            for i in range(1, nombre_processus + 1):
+                listeProcess[i - 1] = Process(target=est_premier_parralèle, args=(nombre, i * 2 + 1, racine, nombre_processus))
 
-            process_2 = Process(target=est_premier_parralèle, args=(nombre, 5, racine))
-            process_2.start()
+                listeProcess[i - 1].start()
 
-            listeProcess[1] = process_2
+            for process in listeProcess:
+                process.join()
 
-            process_3 = Process(target=est_premier_parralèle, args=(nombre, 7, racine))
-            process_3.start()
-
-            listeProcess[2] = process_3
-
-            process_4 = Process(target=est_premier_parralèle, args=(nombre, 9, racine))
-            process_4.start()
-
-            listeProcess[3] = process_4
-
-            process_1.join()
-            process_2.join()
-            process_3.join()
-            process_4.join()
-
-            return bool(process_1.exitcode) and bool(process_2.exitcode) and \
-                   bool(process_3.exitcode) and bool(process_4.exitcode)
+            for process in listeProcess:
+                if not bool(process.exitcode):
+                    return False
+            return True
         else:
-            process_1 = Process(target=est_premier_parralèle, args=(nombre, 3, racine))
-            process_1.start()
-            print("* pid " + str(process_1.pid) + " -- range(" + str(3) + ", " + str(racine + 1) +
-                  ", 8)")
-            listeProcess[0] = process_1
 
-            process_2 = Process(target=est_premier_parralèle, args=(nombre, 5, racine))
-            process_2.start()
-            print("* pid " + str(process_2.pid) + " -- range(" + str(5) + ", " + str(racine + 1) +
-                  ", 8)\n", end='')
-            listeProcess[1] = process_2
+            for i in range(1, nombre_processus + 1):
+                listeProcess[i - 1] = Process(target=est_premier_parralèle, args=(nombre, i * 2 + 1, racine, nombre_processus))
 
-            process_3 = Process(target=est_premier_parralèle, args=(nombre, 7, racine))
-            process_3.start()
-            print("* pid " + str(process_3.pid) + " -- range(" + str(7) + ", " + str(racine + 1) +
-                  ", 8)\n", end='')
-            listeProcess[2] = process_3
+                listeProcess[i - 1].start()
 
-            process_4 = Process(target=est_premier_parralèle, args=(nombre, 9, racine))
-            process_4.start()
-            print("* pid " + str(process_4.pid) + " -- range(" + str(9) + ", " + str(racine + 1) +
-                  ", 8)\n", end='')
-            listeProcess[3] = process_4
+                print("* pid " + str(listeProcess[i - 1].pid) + " -- range(" + str(i * 2 + 1) + ", " + str(racine + 1) +
+                      "," + str(nombre_processus * 2) + ")")
 
-            process_1.join()
-            process_2.join()
-            process_3.join()
-            process_4.join()
 
-            return bool(process_1.exitcode) and bool(process_2.exitcode) and \
-                   bool(process_3.exitcode) and bool(process_4.exitcode)
+
+            for process in listeProcess:
+                process.join()
+
+            for process in listeProcess:
+                if not bool(process.exitcode):
+                    return False
+            return True
+
+
+
 
 
 def exexit(ex: BaseException, exit_code: int = 1) -> NoReturn:
@@ -177,12 +164,12 @@ def exexit(ex: BaseException, exit_code: int = 1) -> NoReturn:
     sys.exit(exit_code)
 
 
-def est_premier_parralèle(chiffre: int, chiffre_début: int, resultat_racine: int) -> None:
+def est_premier_parralèle(chiffre: int, chiffre_début: int, resultat_racine: int, nb_proce: int) -> None:
     sys.stderr = open(os.devnull, 'w')
     setproctitle("SF range(" + str(chiffre_début) + ", " + str(resultat_racine + 1) +
                  ", 8)\n")
 
-    for n in range(chiffre_début, resultat_racine + 1, 8):
+    for n in range(chiffre_début, resultat_racine + 1, nb_proce * 2):
         if chiffre % n == 0:
             sys.exit(0)
 
